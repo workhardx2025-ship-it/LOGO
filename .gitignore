@@ -1,0 +1,173 @@
+# Dependencies
+node_modules/
+server/node_modules/
+client/node_modules/
+# package-lock.json - обычно коммитится для фиксации версий
+# yarn.lock - обычно коммитится для фиксации версий
+# pnpm-lock.yaml - обычно коммитится для фиксации версий
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+server/.env
+server/.env.local
+server/.env.*.local
+# Примечание: .env.example и env.example файлы МОЖНО коммитить (это шаблоны)
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+server/database.sqlite
+server/database.sqlite-journal
+server/database.sqlite-wal
+server/database.sqlite-shm
+
+# Build outputs
+dist/
+build/
+.vite/
+client/dist/
+client/build/
+
+# Temporary files
+server/temp/
+server/tmp/
+*.tmp
+*.temp
+
+# Uploads and user content
+server/uploads/
+server/uploads/**/*
+!server/uploads/.gitkeep
+
+# Models (Vosk, Whisper, etc.)
+server/models/
+server/models/**/*
+!server/models/.gitkeep
+*.zip
+*.tar.gz
+*.tar
+
+# SSL/TLS certificates
+server/certs/
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# PM2
+.pm2/
+# ecosystem.config.js - можно коммитить для продакшена
+
+# Coverage and testing
+coverage/
+.nyc_output/
+*.lcov
+.jest/
+
+# Cache
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variable files (уже указано выше)
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Windows specific
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# MacOS specific
+.AppleDouble
+.LSOverride
+Icon
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# PM2 logs
+.pm2/logs/
+
+# Vite (уже указано выше в Build outputs)
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js (if ever used)
+.next/
+out/
+
+# Nuxt.js (if ever used)
+.nuxt/
+.nitro/
+.cache/
