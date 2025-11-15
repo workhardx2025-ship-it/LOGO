@@ -243,6 +243,27 @@ sudo ufw reload
 ### Полезные команды
 
 ```bash
+# Обновление кода из git
+cd /root/LOGO
+git pull origin main  # или git pull origin master
+
+# После обновления кода:
+# 1. Установите новые зависимости (если есть)
+npm run install-all
+
+# 2. Пересоберите frontend (если изменился)
+cd /root/LOGO/client
+npm run build
+sudo chown -R www-data:www-data /root/LOGO/client/dist
+sudo chmod -R 755 /root/LOGO/client/dist
+
+# 3. Перезапустите backend
+pm2 restart speech-api
+
+# 4. Перезагрузите Nginx (если изменилась конфигурация)
+sudo nginx -t
+sudo systemctl reload nginx
+
 # Проверка статуса
 pm2 status
 pm2 logs speech-api

@@ -20,6 +20,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware для логирования запросов
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  const timestamp = new Date().toISOString();
+  const ip = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
+  const method = req.method;
+  const url = req.originalUrl || req.url;
+  const userAgent = req.get('user-agent') || 'unknown';
+  
+  console.log(`[${timestamp}] ${method} ${url} - IP: ${ip} - User-Agent: ${userAgent.substring(0, 50)}`);
+  
+  // Логируем тело запроса для POST/PUT (только для API, не для больших файлов)
+  if ((method === 'POST' || method === 'PUT') && req.body && Object.keys(req.body).length > 0) {
+    const bodyPreview = JSON.stringify(req.body).substring(0, 200);
+    if (bodyPreview.length < JSON.stringify(req.body).length) {
+      console.log(`  Body: ${bodyPreview}...`);
+    } else {
+      console.log(`  Body: ${bodyPreview}`);
+    }
+  }
+  
+  // Логируем ответ после отправки
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    const statusColor = res.statusCode >= 500 ? '🔴' : res.statusCode >= 400 ? '🟡' : '🟢';
+    console.log(`[${new Date().toISOString()}] ${statusColor} ${method} ${url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
+  });
+  
+  next();
+});
+
 // Инициализация базы данных
 db.init();
 
