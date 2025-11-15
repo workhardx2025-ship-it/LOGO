@@ -1,0 +1,662 @@
+.lesson-view {
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: white;
+}
+
+.lesson-card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.5rem;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: white;
+}
+
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.lesson-header h2 {
+  color: #333;
+  flex: 1;
+  text-align: center;
+}
+
+.lesson-stats {
+  background: linear-gradient(135deg, #FF6B9D 0%, #FF8E53 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+}
+
+.progress-bar-container {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  background: #e0e0e0;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #FF6B9D 0%, #FF8E53 50%, #FFC93C 100%);
+  transition: width 0.3s ease;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #333;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.word-display {
+  text-align: center;
+  margin: 2rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.word-image-container {
+  margin-bottom: 1.5rem;
+  flex: 1;
+  min-height: 200px;
+  max-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.word-image-container:hover {
+  transform: scale(1.02);
+}
+
+.word-image-container:has(.recording-overlay):hover {
+  transform: none;
+}
+
+.word-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.word-placeholder {
+  width: 100%;
+  height: 300px;
+  background: #f8f9fa;
+  border: 3px dashed #ddd;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.word-text h3 {
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.word-to-say {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #FF6B9D 0%, #FF8E53 50%, #4ECDC4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.recording-controls {
+  text-align: center;
+  margin: 1.5rem 0;
+  flex-shrink: 0;
+}
+
+.recording-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  z-index: 10;
+}
+
+.recording-indicator {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+.recording-indicator-no-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.recording-hint {
+  text-align: center;
+  margin: 1rem 0;
+  flex-shrink: 0;
+}
+
+.microphone-error {
+  margin: 1.5rem 0;
+  flex-shrink: 0;
+}
+
+.error-content {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(238, 90, 111, 0.3);
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: white;
+}
+
+.error-content > p {
+  margin: 0 0 1rem 0;
+  opacity: 0.95;
+}
+
+.error-instructions {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.error-instructions > p {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.error-instructions ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.error-instructions li {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.error-content .btn {
+  margin-top: 1rem;
+  background: white;
+  color: #ee5a6f;
+  border: none;
+  font-weight: 600;
+}
+
+.error-content .btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.microphone-permission-request {
+  margin: 1.5rem 0;
+  flex-shrink: 0;
+}
+
+.permission-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  text-align: center;
+}
+
+.permission-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+.permission-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.permission-content > p {
+  margin: 0 0 1.5rem 0;
+  opacity: 0.95;
+  font-size: 1.1rem;
+}
+
+.permission-content .btn {
+  background: white;
+  color: #667eea;
+  border: none;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  min-width: 250px;
+}
+
+.permission-content .btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.permission-content .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.permission-hint {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.hint-text {
+  color: #666;
+  font-size: 1rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.btn-large {
+  padding: 1.5rem 3rem;
+  font-size: 1.25rem;
+  min-width: 250px;
+}
+
+.btn.recording {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.attempts-info {
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.success-message {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: successPulse 0.6s ease;
+}
+
+.success-icon {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  animation: bounce 0.6s ease;
+}
+
+.success-message h2 {
+  background: linear-gradient(135deg, #4ECDC4 0%, #95E1D3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.success-message p {
+  color: #666;
+  font-size: 1.125rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+  .microphone-error {
+    margin: 1rem 0;
+  }
+
+  .error-content {
+    padding: 1rem;
+  }
+
+  .error-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .error-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .error-instructions {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .error-instructions ul {
+    padding-left: 1.25rem;
+  }
+
+  .error-instructions li {
+    margin: 0.4rem 0;
+    font-size: 0.85rem;
+  }
+
+  .error-content .btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .microphone-permission-request {
+    margin: 1rem 0;
+  }
+
+  .permission-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .permission-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .permission-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .permission-content > p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .permission-content .btn {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+    min-width: auto;
+  }
+
+  .permission-hint {
+    font-size: 0.85rem;
+  }
+  
+  .lesson-view {
+    max-width: 100%;
+    height: 100vh;
+  }
+
+  .lesson-card {
+    padding: 1rem;
+  }
+
+  .lesson-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .lesson-header h2 {
+    font-size: 1.25rem;
+    text-align: left;
+  }
+
+  .lesson-stats {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .progress-bar-container {
+    height: 32px;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+  }
+
+  .word-display {
+    margin: 1rem 0;
+  }
+
+  .word-image-container {
+    min-height: 150px;
+    max-height: 40vh;
+    margin-bottom: 1rem;
+  }
+
+  .word-image {
+    max-height: 250px;
+  }
+
+  .word-placeholder {
+    height: 200px;
+  }
+
+  .placeholder-icon {
+    font-size: 3rem;
+  }
+
+  .word-text h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .word-to-say {
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .recording-controls {
+    margin: 1rem 0;
+  }
+
+  .btn-large {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .attempts-info {
+    font-size: 0.8rem;
+  }
+
+  .success-message {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+    border-radius: 16px;
+  }
+
+  .success-icon {
+    font-size: 4rem;
+  }
+
+  .success-message h2 {
+    font-size: 1.5rem;
+  }
+
+  .success-message p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lesson-card {
+    padding: 0.75rem;
+  }
+
+  .lesson-header {
+    margin-bottom: 1rem;
+  }
+
+  .lesson-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .progress-bar-container {
+    height: 32px;
+    margin-bottom: 1rem;
+  }
+
+  .word-display {
+    margin: 0.75rem 0;
+  }
+
+  .word-to-say {
+    font-size: 1.75rem;
+  }
+
+  .word-image-container {
+    min-height: 120px;
+    max-height: 35vh;
+  }
+
+  .word-placeholder {
+    height: 120px;
+  }
+
+  .recording-controls {
+    margin: 0.75rem 0;
+  }
+
+  .placeholder-icon {
+    font-size: 2.5rem;
+  }
+
+  .success-message {
+    padding: 1.5rem 1rem;
+  }
+
+  .success-icon {
+    font-size: 3.5rem;
+  }
+
+  .success-message h2 {
+    font-size: 1.25rem;
+  }
+}
+

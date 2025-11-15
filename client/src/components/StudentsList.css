@@ -1,0 +1,240 @@
+.students-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.students-header h2 {
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.student-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: inherit;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.student-card:hover {
+  border-color: #FF6B9D;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.05) 0%, rgba(255, 142, 83, 0.05) 100%);
+}
+
+.student-info h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.student-date {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.empty-state p {
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+
+/* Гамбургер меню */
+.menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hamburger-btn {
+  background: #f8f9fa;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-btn:hover {
+  background: #e9ecef;
+  border-color: #FF6B9D;
+  color: #FF6B9D;
+}
+
+.hamburger-btn.btn-small {
+  padding: 0.375rem 0.5rem;
+  font-size: 1rem;
+  min-width: 32px;
+  height: 32px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 180px;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-item.danger {
+  color: #dc3545;
+}
+
+.dropdown-item.danger:hover {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.student-info-link {
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+}
+
+.error {
+  color: #dc3545;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+  .students-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .students-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .students-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .student-card {
+    padding: 1.25rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .student-info-link {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .menu-container {
+    flex-shrink: 0;
+  }
+  
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  .student-info h3 {
+    font-size: 1.1rem;
+  }
+
+  .student-date {
+    font-size: 0.8rem;
+  }
+
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+
+  .empty-state p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .students-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .student-card {
+    padding: 1rem;
+  }
+}
+

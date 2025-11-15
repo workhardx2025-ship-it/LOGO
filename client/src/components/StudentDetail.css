@@ -1,0 +1,292 @@
+.student-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.back-link {
+  color: #FF6B9D;
+  text-decoration: none;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  color: #FF8E53;
+  text-decoration: underline;
+  transform: translateX(-2px);
+}
+
+.student-meta {
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.lesson-item:hover {
+  border-color: #FF6B9D;
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.05) 0%, rgba(255, 142, 83, 0.05) 100%);
+}
+
+.lesson-info h4 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.lesson-info p {
+  color: #666;
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.target-sounds {
+  background: linear-gradient(135deg, #FF6B9D 0%, #FF8E53 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+.lesson-date {
+  font-size: 0.75rem !important;
+  color: #999 !important;
+}
+
+.progress-stats {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.progress-item {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.progress-date {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.progress-details {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.progress-details span {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+/* Гамбургер меню */
+.menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hamburger-btn {
+  background: #f8f9fa;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-btn:hover {
+  background: #e9ecef;
+  border-color: #FF6B9D;
+  color: #FF6B9D;
+}
+
+.hamburger-btn.btn-small {
+  padding: 0.375rem 0.5rem;
+  font-size: 1rem;
+  min-width: 32px;
+  height: 32px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 180px;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-item.danger {
+  color: #dc3545;
+}
+
+.dropdown-item.danger:hover {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+  .student-detail-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+  }
+
+  .lesson-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .lesson-actions {
+    flex-direction: row;
+    width: 100%;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+
+  .lesson-actions .btn {
+    flex: 1;
+  }
+  
+  .lesson-actions .menu-container {
+    flex-shrink: 0;
+  }
+  
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  .lesson-info h4 {
+    font-size: 1.1rem;
+  }
+
+  .progress-details {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .progress-item {
+    padding: 0.875rem;
+  }
+
+  /* Адаптивность для графика */
+  .progress-chart {
+    height: 250px;
+  }
+
+  .progress-chart .recharts-wrapper {
+    height: 250px !important;
+  }
+
+  .card .recharts-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .lesson-item {
+    padding: 1rem;
+  }
+
+  .lesson-info h4 {
+    font-size: 1rem;
+  }
+
+  .lesson-info p {
+    font-size: 0.8rem;
+  }
+
+  .progress-chart {
+    height: 200px;
+  }
+
+  .progress-chart .recharts-wrapper {
+    height: 200px !important;
+  }
+}
+
