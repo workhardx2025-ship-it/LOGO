@@ -110,10 +110,194 @@ npm run dev
 └── package.json
 ```
 
+## Развертывание на продакшене
+
+### Быстрый старт для VPS (Ubuntu/Debian)
+
+1. **Установите зависимости:**
+```bash
+# Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Build tools (для компиляции нативных модулей)
+sudo apt-get install -y build-essential python3 make gcc g++
+
+# FFmpeg
+sudo apt-get install -y ffmpeg
+
+# PM2
+sudo npm install -g pm2
+
+# Nginx
+sudo apt-get install -y nginx
+```
+
+2. **Клонируйте репозиторий и установите зависимости:**
+```bash
+git clone https://github.com/workhardx2025-ship-it/LOGO
+cd LOGO
+npm run install-all
+```
+
+3. **Настройте .env:**
+```bash
+cd server
+cp .env.example .env
+nano .env
+# Установите SPEECH_RECOGNITION_SYSTEM=openai и OPENAI_API_KEY
+```
+
+4. **Соберите frontend:**
+```bash
+cd ../client
+npm run build
+```
+
+5. **Настройте Nginx:**
+```bash
+sudo nano /etc/nginx/sites-available/speech-therapist
+```
+
+Вставьте конфигурацию (замените `your-ip` на ваш IP):
+```nginx
+server {
+    listen 80;
+    server_name your-ip;  # Например: 89.104.66.105
+
+    # Увеличенный лимит для загрузки файлов (фото со смартфонов)
+    client_max_body_size 50M;
+
+    root /root/LOGO/client/dist;
+    index index.html;
+
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # Увеличенный лимит для загрузки через прокси
+        client_max_body_size 50M;
+    }
+
+    location /uploads {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+6. **Активируйте конфигурацию:**
+```bash
+sudo rm /etc/nginx/sites-enabled/default  # Удалить дефолтную
+sudo ln -s /etc/nginx/sites-available/speech-therapist /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+7. **Исправьте права доступа:**
+```bash
+sudo chmod 755 /root
+sudo chmod 755 /root/LOGO
+sudo chmod 755 /root/LOGO/client
+sudo chmod 755 /root/LOGO/client/dist
+sudo chown -R www-data:www-data /root/LOGO/client/dist
+sudo chmod -R 755 /root/LOGO/client/dist
+```
+
+8. **Запустите backend через PM2:**
+```bash
+cd /root/LOGO/server
+pm2 start index.js --name "speech-api" --env production
+pm2 save
+pm2 startup  # Настройка автозапуска
+```
+
+9. **Откройте firewall:**
+```bash
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 22/tcp
+sudo ufw reload
+```
+
+**Готово!** Приложение доступно по адресу: `http://your-ip`
+
+### Архитектура продакшена
+
+- **Frontend**: Статические файлы → Nginx (порт 80)
+- **Backend**: Node.js API → PM2 (порт 3001)
+- **Nginx**: Проксирует `/api/*` на backend
+
+**Важно:**
+- ✅ Frontend обслуживается через **Nginx** (не PM2 serve)
+- ✅ Backend запускается через **PM2**
+- ❌ PM2 serve для frontend не работает правильно с API
+
+### Полезные команды
+
+```bash
+# Проверка статуса
+pm2 status
+pm2 logs speech-api
+
+# Перезапуск после изменений
+cd /root/LOGO/client && npm run build
+sudo systemctl reload nginx
+pm2 restart speech-api
+
+# Остановка/запуск Nginx
+sudo systemctl stop nginx
+sudo systemctl start nginx
+sudo systemctl reload nginx
+
+# Проверка логов
+sudo tail -f /var/log/nginx/error.log
+pm2 logs speech-api --lines 50
+```
+
+### Решение проблем
+
+**Ошибка "Permission denied":**
+```bash
+sudo chown -R www-data:www-data /root/LOGO/client/dist
+sudo chmod -R 755 /root/LOGO/client/dist
+```
+
+**Ошибка 500:**
+```bash
+# Проверьте логи
+sudo tail -50 /var/log/nginx/error.log
+pm2 logs speech-api --lines 20
+
+# Проверьте, что backend запущен
+pm2 status
+curl http://localhost:3001/api/students
+```
+
+**Frontend не загружается:**
+- Убедитесь, что frontend собран: `ls -la /root/LOGO/client/dist/index.html`
+- Проверьте конфигурацию Nginx: `sudo nginx -t`
+- Проверьте права доступа (см. выше)
+
+**Ошибка 413 при загрузке картинок:**
+- Увеличьте лимит в Nginx: добавьте `client_max_body_size 50M;` в конфигурацию
+- Перезагрузите Nginx: `sudo systemctl reload nginx`
+- Перезапустите backend: `pm2 restart speech-api`
+
+Подробная документация по развертыванию: см. `HOSTING_REG_RU.md`
+
 ## Примечания
 
-- Для работы распознавания речи необходим OpenAI API ключ
+- Для работы распознавания речи необходим OpenAI API ключ (или используйте локальный Whisper)
 - Картинки для слов можно добавлять через путь к файлу или URL
 - Все данные сохраняются в локальной базе данных SQLite
 - Приложение работает в браузере и требует разрешения на использование микрофона
+- Для работы микрофона на Safari iOS требуется HTTPS
 
