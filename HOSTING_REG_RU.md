@@ -248,11 +248,257 @@ pm2 restart speech-api
 
 **⚠️ Внимание:** Самоподписанные сертификаты будут показывать предупреждение в браузере. Для продакшена используйте Let's Encrypt!
 
-#### Вариант 3: Использование IP адреса с Let's Encrypt (не рекомендуется)
+#### Проверка работы HTTPS сертификатов
+
+**1. Проверьте существование файлов сертификатов:**
+```bash
+# Для Node.js сертификатов
+ls -la /root/LOGO/server/certs/
+
+# Для Let's Encrypt сертификатов
+ls -la /etc/letsencrypt/live/your-domain.com/
+```
+
+**2. Проверьте валидность сертификата через OpenSSL:**
+```bash
+# Для самоподписанного сертификата
+openssl x509 -in /root/LOGO/server/certs/localhost.pem -text -noout
+
+# Для Let's Encrypt сертификата
+openssl x509 -in /etc/letsencrypt/live/your-domain.com/fullchain.pem -text -noout
+```
+
+Проверьте:
+- `Subject:` - должен содержать ваш домен или IP
+- `Validity` - срок действия сертификата
+- `Issuer:` - для Let's Encrypt должно быть "Let's Encrypt"
+
+**3. Проверьте подключение через curl (для Node.js HTTPS):**
+```bash
+# Если backend использует HTTPS напрямую
+curl -k https://localhost:3001/api/health
+# -k игнорирует ошибки сертификата (для самоподписанных)
+
+# С проверкой сертификата (для Let's Encrypt)
+curl https://your-domain.com/api/health
+```
+
+**4. Проверьте подключение через curl (для Nginx HTTPS):**
+```bash
+# Если используется Nginx с HTTPS
+curl -k https://89.104.66.105/api/health
+# или
+curl https://your-domain.com/api/health
+```
+
+**5. Проверьте сертификат через openssl s_client:**
+```bash
+# Для Node.js (порт 3001)
+echo | openssl s_client -connect localhost:3001 -servername localhost 2>/dev/null | openssl x509 -noout -dates
+
+# Для Nginx (порт 443)
+echo | openssl s_client -connect 89.104.66.105:443 -servername 89.104.66.105 2>/dev/null | openssl x509 -noout -dates
+```
+
+**6. Проверьте в браузере:**
+- Откройте `https://your-domain.com` или `https://89.104.66.105`
+- Нажмите на значок замка в адресной строке
+- Просмотрите информацию о сертификате
+- Для самоподписанных сертификатов будет предупреждение (это нормально)
+
+**7. Проверьте логи backend:**
+```bash
+pm2 logs speech-api --lines 50
+```
+
+Ищите сообщения:
+- `✅ HTTPS сертификаты загружены` - сертификаты найдены и загружены
+- `⚠️ HTTPS включен, но сертификаты не найдены` - проблема с путями
+
+**8. Проверьте конфигурацию Nginx (если используется):**
+```bash
+sudo nginx -t
+sudo cat /etc/nginx/sites-available/speech-therapist | grep -A 5 ssl_certificate
+```
+
+**9. Проверьте статус Certbot (для Let's Encrypt):**
+```bash
+sudo certbot certificates
+```
+
+**10. Тест автоматического обновления (для Let's Encrypt):**
+```bash
+sudo certbot renew --dry-run
+```
+
+#### Вариант 3: ZeroSSL сертификат (альтернатива Let's Encrypt)
+
+ZeroSSL предоставляет бесплатные SSL сертификаты. Для подтверждения домена через загрузку файла:
+
+**Шаги:**
+
+1. **Создайте директорию для файла авторизации:**
+```bash
+sudo mkdir -p /root/LOGO/client/dist/.well-known/pki-validation
+```
+
+2. **Скачайте файл авторизации с ZeroSSL:**
+   - На странице ZeroSSL нажмите "Загрузить файл авторизации"
+   - Скопируйте содержимое файла
+
+3. **Создайте файл на сервере:**
+```bash
+sudo nano /root/LOGO/client/dist/.well-known/pki-validation/19E735109C757BCB6AFFD74F434DAC4B.txt
+```
+   - Вставьте содержимое файла авторизации
+   - Сохраните: `Ctrl+O`, `Enter`, `Ctrl+X`
+
+   **Или создайте файл через echo:**
+```bash
+echo "содержимое_файла_авторизации" | sudo tee /root/LOGO/client/dist/.well-known/pki-validation/19E735109C757BCB6AFFD74F434DAC4B.txt
+```
+
+4. **Установите права доступа:**
+```bash
+sudo chmod 644 /root/LOGO/client/dist/.well-known/pki-validation/19E735109C757BCB6AFFD74F434DAC4B.txt
+sudo chown -R www-data:www-data /root/LOGO/client/dist/.well-known
+```
+
+5. **Настройте Nginx для обслуживания файлов .well-known:**
+```bash
+sudo nano /etc/nginx/sites-available/speech-therapist
+```
+
+Добавьте в секцию `server` (перед `location /`):
+```nginx
+# Для подтверждения домена ZeroSSL
+location /.well-known {
+    root /root/LOGO/client/dist;
+    allow all;
+}
+```
+
+6. **Проверьте конфигурацию и перезагрузите Nginx:**
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+7. **Проверьте доступность файла:**
+```bash
+curl http://89.104.66.105/.well-known/pki-validation/19E735109C757BCB6AFFD74F434DAC4B.txt
+```
+
+Должен вернуться содержимое файла авторизации.
+
+8. **Вернитесь на ZeroSSL и нажмите "Следующий шаг"**
+
+9. **После получения сертификата, загрузите файлы на сервер:**
+
+Обычно ZeroSSL предоставляет:
+- `certificate.crt` (или `certificate.pem`) - сертификат
+- `private.key` - приватный ключ
+- `ca_bundle.crt` - цепочка сертификатов (опционально)
+
+**Загрузите файлы на сервер:**
+```bash
+# Создайте директорию для сертификатов
+sudo mkdir -p /etc/ssl/zerossl
+
+# Загрузите файлы (используйте scp, sftp или скопируйте содержимое)
+# Например, через scp с вашего компьютера:
+# scp certificate.crt root@89.104.66.105:/etc/ssl/zerossl/
+# scp private.key root@89.104.66.105:/etc/ssl/zerossl/
+# scp ca_bundle.crt root@89.104.66.105:/etc/ssl/zerossl/
+
+# Или создайте файлы вручную на сервере:
+sudo nano /etc/ssl/zerossl/certificate.crt
+# Вставьте содержимое сертификата
+
+sudo nano /etc/ssl/zerossl/private.key
+# Вставьте содержимое приватного ключа
+
+# Если есть ca_bundle.crt, объедините с certificate.crt:
+sudo cat /etc/ssl/zerossl/certificate.crt /etc/ssl/zerossl/ca_bundle.crt > /etc/ssl/zerossl/fullchain.crt
+```
+
+**Установите права доступа:**
+```bash
+sudo chmod 644 /etc/ssl/zerossl/certificate.crt
+sudo chmod 600 /etc/ssl/zerossl/private.key
+sudo chown root:root /etc/ssl/zerossl/*
+```
+
+10. **Настройте Nginx для HTTPS:**
+```bash
+sudo nano /etc/nginx/sites-available/speech-therapist
+```
+
+Добавьте конфигурацию HTTPS:
+```nginx
+server {
+    listen 80;
+    server_name 89.104.66.105;
+
+    # Редирект на HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    # Для подтверждения домена (до получения сертификата)
+    location /.well-known {
+        root /root/LOGO/client/dist;
+        allow all;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name 89.104.66.105;
+
+    # Пути к сертификатам ZeroSSL
+    ssl_certificate /etc/ssl/zerossl/fullchain.crt;  # или /etc/ssl/zerossl/certificate.crt если нет ca_bundle
+    ssl_certificate_key /etc/ssl/zerossl/private.key;
+    
+    # Рекомендуемые настройки SSL
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Увеличенный лимит для загрузки файлов
+    client_max_body_size 50M;
+
+    root /root/LOGO/client/dist;
+    index index.html;
+
+    location /api {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        client_max_body_size 50M;
+    }
+
+    location /uploads {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+**Примечание:** Замените `/path/to/your/certificate.crt` и `/path/to/your/private.key` на реальные пути к вашим сертификатам ZeroSSL.
+
+#### Вариант 4: Использование IP адреса с Let's Encrypt (не рекомендуется)
 
 Let's Encrypt не выдает сертификаты для IP адресов. Если у вас только IP:
 - Используйте самоподписанный сертификат (Вариант 2)
-- Или приобретите домен и используйте Вариант 1
+- Или приобретите домен и используйте Вариант 1 или 3
 
 ## 📦 Инструкция по развертыванию
 
@@ -901,6 +1147,199 @@ sudo tail -20 /var/log/nginx/error.log
 pm2 restart speech-api
 pm2 status
 ```
+
+### Проблема: Ошибка 502 Bad Gateway - "Connection refused" или "upstream prematurely closed"
+
+**Симптомы из логов Nginx:**
+```
+connect() failed (111: Connection refused) while connecting to upstream
+upstream prematurely closed connection
+no live upstreams while connecting to upstream
+```
+
+**Причина:** Backend не запущен, упал, или не слушает на порту 3001.
+
+**Решение:**
+
+1. **Проверьте статус backend:**
+```bash
+pm2 status
+```
+
+Если `speech-api` не запущен или в статусе `errored`:
+```bash
+cd /root/LOGO/server
+pm2 restart speech-api
+# или если не существует:
+pm2 start index.js --name "speech-api" --env production
+pm2 save
+```
+
+2. **Проверьте, слушает ли порт 3001:**
+```bash
+sudo netstat -tlnp | grep 3001
+# или
+sudo ss -tlnp | grep 3001
+```
+
+Если порт не слушается, backend не запущен.
+
+3. **Проверьте подключение к backend:**
+```bash
+curl http://localhost:3001/api/health
+```
+
+Если не работает, проверьте логи:
+```bash
+pm2 logs speech-api --lines 50
+```
+
+4. **Исправьте конфигурацию Nginx (если нужно):**
+```bash
+sudo nano /etc/nginx/sites-available/speech-therapist
+```
+
+Убедитесь, что в `location /api` указан правильный адрес:
+```nginx
+location /api {
+    proxy_pass http://127.0.0.1:3001;  # Используйте 127.0.0.1, а не localhost
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+```
+
+**Важно:** Используйте `127.0.0.1:3001` вместо `localhost:3001`, чтобы избежать проблем с IPv6.
+
+5. **Перезагрузите Nginx:**
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+6. **Проверьте .env файл:**
+```bash
+cd /root/LOGO/server
+cat .env | grep -E "PORT|HOST"
+```
+
+Убедитесь, что:
+```env
+PORT=3001
+HOST=0.0.0.0  # или 127.0.0.1
+```
+
+**Быстрое решение:**
+
+```bash
+# 1. Перезапустите backend
+pm2 restart speech-api
+pm2 status
+
+# 2. Проверьте подключение
+curl http://localhost:3001/api/health
+
+# 3. Если не работает, проверьте логи
+pm2 logs speech-api --lines 50
+
+# 4. Исправьте конфигурацию Nginx (используйте 127.0.0.1)
+sudo nano /etc/nginx/sites-available/speech-therapist
+# Измените proxy_pass на: http://127.0.0.1:3001
+
+# 5. Перезагрузите Nginx
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+**Частые причины:**
+1. Backend не запущен через PM2
+2. Backend упал из-за ошибки (проверьте логи)
+3. Проблемы с базой данных (backend не может запуститься)
+4. Неправильный HOST в .env (должен быть 0.0.0.0 или 127.0.0.1)
+5. Конфликт портов (другой процесс использует 3001)
+
+### Проблема: Ошибка "Модель Vosk не найдена"
+
+**Симптомы:**
+```
+Ошибка: Модель Vosk не найдена по пути: ./models/vosk-model-ru-0.22
+```
+
+**Решение:**
+
+**1. Скачайте модель Vosk на сервере:**
+```bash
+cd /root/LOGO/server
+mkdir -p models
+cd models
+
+# Скачайте модель (выберите одну из вариантов):
+# Вариант 1: Компактная модель (45 MB, быстрее)
+wget https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip
+
+# Вариант 2: Полная модель (1.5 GB, лучше качество)
+wget https://alphacephei.com/vosk/models/vosk-model-ru-0.22.zip
+
+# Распакуйте архив
+unzip vosk-model-ru-0.22.zip
+# или
+unzip vosk-model-small-ru-0.22.zip
+
+# Удалите zip файл (опционально)
+rm *.zip
+```
+
+**2. Проверьте, что модель распакована:**
+```bash
+ls -la /root/LOGO/server/models/vosk-model-ru-0.22/
+# Должны быть файлы: am/, conf/, graph/, ivector/ и т.д.
+```
+
+**3. Проверьте настройки в .env:**
+```bash
+cd /root/LOGO/server
+cat .env | grep VOSK
+```
+
+Убедитесь, что указан правильный путь:
+```env
+SPEECH_RECOGNITION_SYSTEM=vosk
+VOSK_MODEL_PATH=./models/vosk-model-ru-0.22
+```
+
+**4. Перезапустите backend:**
+```bash
+pm2 restart speech-api
+pm2 logs speech-api --lines 30
+```
+
+Ищите сообщения:
+- `[Vosk] Модель успешно загружена!` - всё работает
+- `[Vosk] ✓ Используется русская модель` - модель правильная
+
+**Альтернативное решение (если не хотите использовать Vosk):**
+
+Используйте OpenAI API или локальный Whisper:
+```bash
+cd /root/LOGO/server
+nano .env
+```
+
+Измените:
+```env
+SPEECH_RECOGNITION_SYSTEM=openai
+OPENAI_API_KEY=your_api_key_here
+# или
+SPEECH_RECOGNITION_SYSTEM=local
+```
+
+Затем:
+```bash
+pm2 restart speech-api
+```
+
+**Примечание:** Если у вас нет места на диске для полной модели (1.5 GB), используйте компактную модель `vosk-model-small-ru-0.22` (45 MB).
 
 ### Проблема: Ошибка 500 Internal Server Error
 
